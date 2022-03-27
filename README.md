@@ -12,6 +12,7 @@ title: NixOS Config - Readme
     -   [Repo Layout](#repo-layout)
         -   [test1](#test1)
         -   [test2](#test2)
+    -   [Pre-commit hook test](#pre-commit-hook-test)
 
 # Zyl’s NixOS Config
 
@@ -53,3 +54,7 @@ a
 ### test2
 
 b
+
+## Pre-commit hook test
+
+Does it work?
