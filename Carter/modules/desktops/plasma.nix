@@ -10,6 +10,11 @@ in
     };
 
     config = mkIf cfg.enable {
+            nixpkgs.overlays = [
+                (final: prev: { adwaita-icon-theme-without-gnome = prev.gnome.adwaita-icon-theme.overrideAttrs (oldAttrs: { passthru = null; }); })
+                (final: prev: { adwaita-icon-theme-without-gnome = prev.gnome.adwaita-icon-theme.override      { gnome = null; gtk3 = null; }; })
+            ];
+
             # Enable the X11 windowing system.
             services.xserver.enable = true;
 
@@ -18,5 +23,9 @@ in
             services.xserver.desktopManager.plasma5.enable = true;
 
             services.xserver.displayManager.defaultSession = "plasmawayland";
+
+            environment.systemPackages = [
+                adwaita-icon-theme-without-gnome
+            ];
     };
 }

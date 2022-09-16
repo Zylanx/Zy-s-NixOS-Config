@@ -8,6 +8,8 @@ in
 {
     options = {
         zyls.programs.firefox = {
+            enable = mkEnableOption "firefox";
+
             package = mkPackageOption pkgs firefox-wayland;
 
             autoStart = mkOption {
