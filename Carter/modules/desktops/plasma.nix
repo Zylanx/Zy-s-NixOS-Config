@@ -1,5 +1,7 @@
 { config, pkgs, mkEnableOption, mkOption, mkIf, mkMerge, ... }:
 let
+    inherit (lib) mkIf mkEnableOption;
+
     cfg = config.zyls.desktops.plasma;
 in
 {

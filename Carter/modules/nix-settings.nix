@@ -9,7 +9,7 @@
 
         nix.settings = {
             max-jobs = "auto";
-            settings.auto-optimise-store = true;
+            auto-optimise-store = true;
         };
     };
 }

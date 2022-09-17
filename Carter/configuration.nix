@@ -3,6 +3,7 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config, pkgs, ... }:
+{
     imports = [
         ./hardware-configuration.nix  # Include the results of the hardware scan.
 
@@ -18,16 +19,65 @@
 
         ./modules/programs/zsh.nix
         ./modules/programs/nano.nix
+        ./modules/programs/rider.nix
+        ./modules/programs/clion.nix
+        ./modules/programs/firefox.nix
+        ./modules/programs/discord.nix
+        ./modules/programs/telegram.nix
+        ./modules/programs/kicad.nix
+        ./modules/programs/deluge.nix
+        #./modules/programs/gcloud.nix
+        #./modules/programs/repo.nix
+
 
         ./modules/sound
 
-        ./modules/services/OneDrive.nix
+        ./modules/services/onedrive.nix
+        ./modules/services/virtualisation.nix
+
+        ./modules/misc/aliases.nix
+        ./modules/misc/fonts.nix
+    ];
+
+    nixpkgs.overlays = [
+        (final: prev: { my-kicad = pkgs.callPackage ./pkg/kicad { }; })
     ];
 
     # Bootloader.
-    boot.loader.systemd-boot.enable = true;
-    boot.loader.efi.canTouchEfiVariables = true;
-    boot.loader.efi.efiSysMountPoint = "/boot/efi";
+    boot.loader = {
+        # Use the systemd-boot EFI boot loader.
+        systemd-boot = {
+            enable = true;
+            configurationLimit = 5;
+        };
+
+        efi = {
+            canTouchEfiVariables = true;
+            efiSysMountPoint = "/boot";
+        };
+    };
+
+    systemd.extraConfig = ''
+        DefaultTimeoutStopSec=5s
+    '';
+
+    boot.kernelPackages = pkgs.linuxPackages_latest;
+
+    # Probably move into user services
+    security.pam.u2f =
+    {
+        enable = true;
+        control = "sufficient";
+        cue = true;
+    };
+
+    zramSwap = {
+        enable = true;
+        priority = 2;
+        memoryPercent = 70;
+    };
+
+    services.dbus.enable = true;
 
     networking.hostName = "carter"; # Define your hostname.
 
@@ -42,15 +92,40 @@
 
     # Configure keymap in X11
     services.xserver = {
-      layout = "au";
-      xkbVariant = "";
+        layout = "au";
+        xkbVariant = "";
+    };
+
+    programs.dconf.enable = true;
+
+    xdg = {
+        portal = {
+            enable = true;
+            extraPortals = with pkgs; [
+                xdg-desktop-portal-gtk
+                xdg-desktop-portal-gnome
+            ];
+            gtkUsePortal = true;
+        };
     };
 
     # List packages installed in system profile. To search, run:
     # $ nix search wget
     environment.systemPackages = with pkgs; [
-    #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-    #  wget
+        vim
+        nano
+        git
+        wget
+        killall
+        dialog
+        pciutils
+        wayland-utils
+        vulkan-tools
+        rclone
+        wayland
+        docker
+        bash
+        virtmanager
     ];
 
 

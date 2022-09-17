@@ -1,50 +1,49 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 let
-    cfg = config.zyls.programs.discord;
+    inherit (builtins) attrNames attrValues listToAttrs;
+    inherit (lib) mkIf mkOption mkEnableOption mkPackageOption types traceVal;
 
-    users = builtins.attrNames config.users.users;
+    cfg = config.zyls.programs.discord;
 in
 {
     options = {
         zyls.programs.discord = {
             enable = mkEnableOption "discord";
 
-            package = mkPackageOption pkgs discord;
+            package = mkPackageOption pkgs "discord" { };
 
             autoStart = mkOption {
                 type = types.bool;
 
                 default = false;
             };
-
-            users = mkOption {
-                type = types.listOf (types.enum users)  # TODO: Add duplicate check
-
-                default = [];
-            };
         };
     };
 
     config = mkIf cfg.enable {
-        nixpkgs.config.packageOverrides = pkgs: {
-            discord = pkgs."${cfg.package.pname}".override {
-            nss = pkgs.nss_latest;
-            };
-        };
+#         nixpkgs.config.packageOverrides = opkgs: {
+#             discord = opkgs."${cfg.package.pname}".override {
+#             nss = opkgs.nss_latest;
+#             };
+#         };
+#
+#         nixpkgs.overlays = [
+#             (final: prev: {
+#                 "${cfg.package.pname}" =
+#             })
+#         ]
 
-        users.users = listToAttrs (map
-            (user: {
-                name = user;
-                value = {
-                    packages = [ cfg.package ] // (mkIf cfg.autoStart (
-                        makeAutostartItem {
-                            name = "discord";
-                            package = cfg.package;
-                        }
-                    ));
-                };
-            })
-            cfg.users
-        );
+        environment.systemPackages = let
+            package-override = cfg.package.override { nss = pkgs.nss_latest; };
+        in
+        [
+            package-override
+            (mkIf cfg.autoStart (
+                pkgs.makeAutostartItem {
+                    name = "discord";
+                    package = package-override;
+                }
+            ))
+        ];
     };
 }

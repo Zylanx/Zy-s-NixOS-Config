@@ -23,32 +23,34 @@ let
     };
 in
 {
-    environment.systemPackages = [
-        (pkgs.buildFHSUserEnv {
-            name = "clion-fhs";
+    config = {
+        environment.systemPackages = [
+            (pkgs.buildFHSUserEnv {
+                name = "clion-fhs";
 
-            targetPkgs = pkgs: (with pkgs; [
-                platformio
-                pkg-config
-                jetbrains.clion
-                conan
-                mpi
+                targetPkgs = pkgs: (with pkgs; [
+                    platformio
+                    pkg-config
+                    jetbrains.clion
+                    conan
+                    mpi
 
-                ocl-icd
-                opencl-headers
-                opencl-clhpp
-            ] ++ buildPackages);
+                    ocl-icd
+                    opencl-headers
+                    opencl-clhpp
+                ] ++ buildPackages);
 
-            extraInstallCommands = ''
-            # Create directories
-            mkdir -p $out/share/applications $out/share/pixmaps
+                extraInstallCommands = ''
+                # Create directories
+                mkdir -p $out/share/applications $out/share/pixmaps
 
-            # Create copy over .desktop file
-            ln -s ${desktopItem}/share/applications/* $out/share/applications
-            ln -s ${pkgs.jetbrains.clion}/share/pixmaps/* $out/share/pixmaps
-            '';
+                # Create copy over .desktop file
+                ln -s ${desktopItem}/share/applications/* $out/share/applications
+                ln -s ${pkgs.jetbrains.clion}/share/pixmaps/* $out/share/pixmaps
+                '';
 
-            runScript = "clion";
-        })
-    ];
+                runScript = "clion";
+            })
+        ];
+    };
 }

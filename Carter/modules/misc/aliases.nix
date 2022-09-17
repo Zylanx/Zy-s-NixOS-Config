@@ -18,4 +18,4 @@
             fucking-kill = "systemctl kill --signal=SIGKILL ";
         };
     };
-};
+}

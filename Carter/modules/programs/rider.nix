@@ -23,28 +23,30 @@ let
     };
 in
 {
-    environment.systemPackages = [
-        (pkgs.buildFHSUserEnv {
-            name = "rider-fhs";
+    config = {
+        environment.systemPackages = [
+            (pkgs.buildFHSUserEnv {
+                name = "rider-fhs";
 
-            targetPkgs = pkgs: (with pkgs; [
-                jetbrains.rider
-                (with dotnetCorePackages; combinePackages [
-                    sdk_6_0
-                    sdk_3_1
-                ])
-            ] ++ buildPackages);
+                targetPkgs = pkgs: (with pkgs; [
+                    jetbrains.rider
+                    (with dotnetCorePackages; combinePackages [
+                        sdk_6_0
+                        sdk_3_1
+                    ])
+                ] ++ buildPackages);
 
-            extraInstallCommands = ''
-                # Create directories
-                mkdir -p $out/share/applications $out/share/pixmaps
+                extraInstallCommands = ''
+                    # Create directories
+                    mkdir -p $out/share/applications $out/share/pixmaps
 
-                # Create copy over .desktop file
-                ln -s ${desktopItem}/share/applications/* $out/share/applications
-                ln -s ${pkgs.jetbrains.rider}/share/pixmaps/* $out/share/pixmaps
-            '';
+                    # Create copy over .desktop file
+                    ln -s ${desktopItem}/share/applications/* $out/share/applications
+                    ln -s ${pkgs.jetbrains.rider}/share/pixmaps/* $out/share/pixmaps
+                '';
 
-            runScript = "rider";
-        })
-    ];
+                runScript = "rider";
+            })
+        ];
+    };
 }

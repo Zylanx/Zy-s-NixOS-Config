@@ -8,5 +8,9 @@
             # The next line enables shell command completion for gcloud.
             if [ -f '/home/zyl/gcloudEnv/google-cloud-sdk/completion.bash.inc' ]; then . '/home/zyl/gcloudEnv/google-cloud-sdk/completion.bash.inc'; fi
         '';
+
+        environment.systemPackages = [
+            gcloud
+        ];
     };
 }
