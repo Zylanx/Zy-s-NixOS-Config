@@ -4,21 +4,22 @@
 { config, lib, pkgs, modulesPath, ... }:
 
 {
-  imports = [
-    (modulesPath + "/installer/scan/not-detected.nix")
-
-    <nixos-hardware/common/cpu/intel>
-    <nixos-hardware/common/pc/laptop>
-    <nixos-hardware/common/pc/ssd>
-  ];
-
+  imports =
+    [ (modulesPath + "/installer/scan/not-detected.nix")
+    ];
 
   boot.kernelParams = [
-    # "mem_sleep_default=deep"
+    "mem_sleep_default=deep"
     "nvme.noacpi=1"
     "intel_iommu=on"
   ];
-  boot.initrd.availableKernelModules = [ "xhci_pci" "thunderbolt" "nvme" "usb_storage" "sd_mod" ];
+  boot.initrd.availableKernelModules = [
+    "xhci_pci"
+    "thunderbolt"
+    "nvme"
+    "usb_storage"
+    "sd_mod"
+  ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [
     "kvm-intel"
@@ -27,12 +28,42 @@
   boot.extraModulePackages = [ ];
   boot.extraModprobeConfig = "options i915 enable_guc=2";
 
-  fileSystems."/" =
-    { device = "/dev/disk/by-uuid/5e44501f-468b-4939-8b0c-c972f23c7985";
-      fsType = "ext4";
+  fileSystems = {
+    "/boot" = {
+      device = "/dev/disk/by-uuid/F45A-C859";
+      fsType = "vfat";
     };
 
-  swapDevices = [ ];
+    "/" = {
+      device = "dev/nvme0n1p5";
+      fsType = "btrfs";
+      options = [ "subvol=root" "defaults" "ssd" "compress=zstd" "noatime" "discard=async" ];
+    };
+
+    "/home" = {
+      device = "dev/nvme0n1p5";
+      fsType = "btrfs";
+      options = [ "subvol=home" "defaults" "ssd" "compress=zstd" "noatime" "discard=async" ];
+    };
+
+    "/nix" = {
+      device = "dev/nvme0n1p5";
+      fsType = "btrfs";
+      options = [ "subvol=nix" "defaults" "ssd" "compress=zstd" "noatime" "discard=async" ];
+    };
+
+    "/swap" = {
+      device = "dev/nvme0n1p5";
+      fsType = "btrfs";
+      options = [ "subvol=swap" "defaults" "ssd" "noatime" "discard=async" ];
+    };
+  };
+
+  swapDevices = [ 
+    {
+      device = "/swap/swapfile";
+    } 
+  ];
 
   time.hardwareClockInLocalTime = true;
 
@@ -43,18 +74,21 @@
   networking.useDHCP = lib.mkDefault true;
   # networking.interfaces.wlo1.useDHCP = lib.mkDefault true;
 
-  powerManagement.enable = lib.mkDefault true;
-  powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
-  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-
   hardware.bluetooth.enable = true;
 
+  powerManagement.enable = lib.mkDefault true;
+  powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
+
+  hardware.enableRedistributableFirmware = lib.mkDefault true;
+  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+
+  hardware.onlykey.enable = true;
+  
   hardware.opengl = {
     enable = true;
 
     extraPackages = [
       pkgs.intel-compute-runtime
-      pkgs.beignet
     ];
   };
 }

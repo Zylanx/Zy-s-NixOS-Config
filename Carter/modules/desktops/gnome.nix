@@ -22,10 +22,29 @@ in
                 services.xserver.displayManager.gdm.enable = true;
                 services.xserver.desktopManager.gnome.enable = true;
 
+                environment.systemPackages = with pkgs; [
+                    gnomeExtensions.appindicator
+                    gnomeExtensions.dash-to-dock
+                ];
+
+                services.udev.packages = with pkgs; [
+                    gnome.gnome-settings-daemon
+                ];
+            }
+            {
+                environment.gnome.excludePackages = (with pkgs; [
+                    gnome-tour
+                ]) ++ (with pkgs.gnome; [
+                    cheese
+                    gnome-music
+                ]);
+            }
+            {
+                # Config for GSConnect
                 programs.kdeconnect = {
-                    enable = true;
-                    package = pkgs.gnomeExtensions.gsconnect;
-                };
+                     enable = true;
+                     package = pkgs.gnomeExtensions.gsconnect;
+                 };
             }
             (mkIf cfgAutoLogin.enable {
                 # Workaround for GNOME autologin: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229

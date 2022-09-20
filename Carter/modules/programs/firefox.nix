@@ -5,6 +5,7 @@ let
 
     cfg = config.zyls.programs.firefox;
     cfgPlasma = config.services.xserver.desktopManager.plasma5;
+    cfgGnome = config.services.xserver.desktopManager.gnome;
 in
 {
     options = {
@@ -32,6 +33,7 @@ in
             ))
         ];
 
+        nixpkgs.config.firefox.enableGnomeExtensions = cfgGnome.enable;
         nixpkgs.config.firefox.enablePlasmaBrowserIntegration = cfgPlasma.enable;
     };
 

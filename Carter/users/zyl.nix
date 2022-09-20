@@ -3,11 +3,11 @@
     imports = [
         ../modules/programs/zsh.nix
         ../modules/programs/firefox.nix
-        ../modules/programs/rider.nix
-        ../modules/programs/clion.nix
+        #../modules/programs/rider.nix
+        #../modules/programs/clion.nix
         ../modules/programs/telegram.nix
         ../modules/programs/discord.nix
-        ../modules/programs/kicad.nix
+        #../modules/programs/kicad.nix
     ];
 
     config = {
@@ -20,7 +20,7 @@
             shell = pkgs.zsh;
 
             packages = with pkgs; [
-                my-kicad
+                #kicad
                 filelight
                 rsync
                 lsd
@@ -36,7 +36,7 @@
                 onlykey-cli
                 kate
                 kdevelop
-                jetbrains.pycharm-professional
+               # jetbrains.pycharm-professional
                 platformio
                 (with dotnetCorePackages; combinePackages [
                     sdk_6_0
@@ -78,7 +78,7 @@
 
                 telegram = {
                     enable = true;
-                    autoStart = true;
+                    autoStart = false;
                 };
             };
         };
