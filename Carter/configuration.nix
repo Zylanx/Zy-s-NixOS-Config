@@ -62,6 +62,7 @@
             };
         };
 
+        kernelParams = [ "quiet" ];
         consoleLogLevel = 1;
         initrd.verbose = false;
         plymouth.enable = true;
@@ -93,12 +94,13 @@
     networking.networkmanager.enable = true;
 
     # Set your time zone.
-    time.timeZone = "Australia/Adelaide";
+    time.timeZone = "Australia/Melbourne";
 
     # Select internationalisation properties.
     i18n.defaultLocale = "en_AU.utf8";
 
-    zyls.desktops.pantheon.enable = true;
+    #zyls.desktops.pantheon.enable = true;
+    zyls.desktops.gnome.enable = true;
 
     qt5 = {
       style = "adwaita-dark";

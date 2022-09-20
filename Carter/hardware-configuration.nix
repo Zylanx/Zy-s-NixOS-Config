@@ -4,91 +4,94 @@
 { config, lib, pkgs, modulesPath, ... }:
 
 {
-  imports =
-    [ (modulesPath + "/installer/scan/not-detected.nix")
+    imports = [
+        (modulesPath + "/installer/scan/not-detected.nix")
+        <nixos-hardware/common/cpu/intel>
+        <nixos-hardware/common/pc/laptop>
+        <nixos-hardware/common/pc/ssd>
     ];
 
-  boot.kernelParams = [
-    "mem_sleep_default=deep"
-    "nvme.noacpi=1"
-    "intel_iommu=on"
-  ];
-  boot.initrd.availableKernelModules = [
-    "xhci_pci"
-    "thunderbolt"
-    "nvme"
-    "usb_storage"
-    "sd_mod"
-  ];
-  boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [
-    "kvm-intel"
-    "vfio-pci"
-  ];
-  boot.extraModulePackages = [ ];
-  boot.extraModprobeConfig = "options i915 enable_guc=2";
+    boot.kernelParams = [
+        "mem_sleep_default=deep"
+        "nvme.noacpi=1"
+        "intel_iommu=on"
+    ];
+    boot.initrd.availableKernelModules = [
+        "xhci_pci"
+        "thunderbolt"
+        "nvme"
+        "usb_storage"
+        "sd_mod"
+    ];
+    boot.initrd.kernelModules = [ ];
+    boot.kernelModules = [
+        "kvm-intel"
+        "vfio-pci"
+    ];
+    boot.extraModulePackages = [ ];
+    boot.extraModprobeConfig = "options i915 enable_guc=2";
 
-  fileSystems = {
-    "/boot" = {
-      device = "/dev/disk/by-uuid/F45A-C859";
-      fsType = "vfat";
+    fileSystems = {
+        "/boot" = {
+            device = "/dev/disk/by-uuid/F45A-C859";
+            fsType = "vfat";
+        };
+
+        "/" = {
+            device = "dev/nvme0n1p5";
+            fsType = "btrfs";
+            options = [ "subvol=root" "defaults" "ssd" "compress=zstd" "noatime" "discard=async" ];
+        };
+
+        "/home" = {
+            device = "dev/nvme0n1p5";
+            fsType = "btrfs";
+            options = [ "subvol=home" "defaults" "ssd" "compress=zstd" "noatime" "discard=async" ];
+        };
+
+        "/nix" = {
+            device = "dev/nvme0n1p5";
+            fsType = "btrfs";
+            options = [ "subvol=nix" "defaults" "ssd" "compress=zstd" "noatime" "discard=async" ];
+        };
+
+        "/swap" = {
+            device = "dev/nvme0n1p5";
+            fsType = "btrfs";
+            options = [ "subvol=swap" "defaults" "ssd" "noatime" "discard=async" ];
+        };
     };
 
-    "/" = {
-      device = "dev/nvme0n1p5";
-      fsType = "btrfs";
-      options = [ "subvol=root" "defaults" "ssd" "compress=zstd" "noatime" "discard=async" ];
-    };
+    swapDevices = [ 
+        {
+            device = "/swap/swapfile";
+        } 
+    ];
 
-    "/home" = {
-      device = "dev/nvme0n1p5";
-      fsType = "btrfs";
-      options = [ "subvol=home" "defaults" "ssd" "compress=zstd" "noatime" "discard=async" ];
-    };
+    time.hardwareClockInLocalTime = true;
 
-    "/nix" = {
-      device = "dev/nvme0n1p5";
-      fsType = "btrfs";
-      options = [ "subvol=nix" "defaults" "ssd" "compress=zstd" "noatime" "discard=async" ];
-    };
+    # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
+    # (the default) this is the recommended approach. When using systemd-networkd it's
+    # still possible to use this option, but it's recommended to use it in conjunction
+    # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
+    networking.useDHCP = lib.mkDefault true;
+    # networking.interfaces.wlo1.useDHCP = lib.mkDefault true;
 
-    "/swap" = {
-      device = "dev/nvme0n1p5";
-      fsType = "btrfs";
-      options = [ "subvol=swap" "defaults" "ssd" "noatime" "discard=async" ];
-    };
-  };
+    hardware.bluetooth.enable = true;
 
-  swapDevices = [ 
-    {
-      device = "/swap/swapfile";
-    } 
-  ];
+    powerManagement.enable = lib.mkDefault true;
+    powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
 
-  time.hardwareClockInLocalTime = true;
+    hardware.enableRedistributableFirmware = lib.mkDefault true;
+    hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 
-  # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
-  # (the default) this is the recommended approach. When using systemd-networkd it's
-  # still possible to use this option, but it's recommended to use it in conjunction
-  # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
-  networking.useDHCP = lib.mkDefault true;
-  # networking.interfaces.wlo1.useDHCP = lib.mkDefault true;
-
-  hardware.bluetooth.enable = true;
-
-  powerManagement.enable = lib.mkDefault true;
-  powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
-
-  hardware.enableRedistributableFirmware = lib.mkDefault true;
-  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-
-  hardware.onlykey.enable = true;
+    hardware.onlykey.enable = true;
   
-  hardware.opengl = {
-    enable = true;
+    hardware.opengl = {
+        enable = true;
 
-    extraPackages = [
-      pkgs.intel-compute-runtime
-    ];
-  };
+        extraPackages = [
+            pkgs.intel-compute-runtime
+        ];
+    };
 }

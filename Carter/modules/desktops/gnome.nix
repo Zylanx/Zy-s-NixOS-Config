@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+ { config, lib, pkgs, ... }:
 let
     inherit (lib) mkIf mkEnableOption mkMerge;
 
@@ -25,6 +25,8 @@ in
                 environment.systemPackages = with pkgs; [
                     gnomeExtensions.appindicator
                     gnomeExtensions.dash-to-dock
+                    gnomeExtensions.dash-to-panel
+                    gnome.gnome-tweaks
                 ];
 
                 services.udev.packages = with pkgs; [
