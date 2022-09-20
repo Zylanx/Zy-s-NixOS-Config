@@ -98,7 +98,7 @@
     # Select internationalisation properties.
     i18n.defaultLocale = "en_AU.utf8";
 
-    zyls.desktops.gnome.enable = true;
+    zyls.desktops.pantheon.enable = true;
 
     qt5 = {
       style = "adwaita-dark";
@@ -116,10 +116,10 @@
         portal = {
             enable = true;
             
-            extraPortals = lib.mkForce (with pkgs; [
-                xdg-desktop-portal-gtk
-                xdg-desktop-portal-kde
-            ]);
+            #extraPortals = (with pkgs; [
+            #    xdg-desktop-portal-gtk
+            #    xdg-desktop-portal-kde
+            #]);
             
             gtkUsePortal = true;
         };
