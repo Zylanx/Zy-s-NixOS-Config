@@ -1,4 +1,4 @@
-{ config, pkgs, mkEnableOption, mkOption, mkIf, mkMerge, ... }:
+{ config, lib, pkgs, ... }:
 let
     inherit (lib) mkIf mkEnableOption;
 
@@ -27,7 +27,7 @@ in
             services.xserver.displayManager.defaultSession = "plasmawayland";
 
             environment.systemPackages = [
-                adwaita-icon-theme-without-gnome
+                pkgs.adwaita-icon-theme-without-gnome
             ];
     };
 }

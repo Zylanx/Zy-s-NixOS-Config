@@ -62,7 +62,7 @@
             };
         };
 
-        consoleLogLevel = 3;
+        consoleLogLevel = 1;
         initrd.verbose = false;
         plymouth.enable = true;
     };
